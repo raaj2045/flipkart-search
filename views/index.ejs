@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title><%= title %></title>
+
+		<link
+			href="https://fonts.googleapis.com/css?family=Roboto"
+			rel="stylesheet"
+		/>
+		<!--Import Google Icon Font-->
+		<link
+			href="https://fonts.googleapis.com/icon?family=Material+Icons"
+			rel="stylesheet"
+		/>
+		<!-- Compiled and minified CSS -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+		/>
+
+		<link rel="stylesheet" href="/stylesheets/style.css" />
+	</head>
+	<body>
+		<nav>
+			<div class="nav-wrapper">
+				<a href="#!" class="brand-logo">Search</a>
+				<a href="#" data-target="mobile-demo" class="sidenav-trigger"
+					><i class="material-icons">menu</i></a
+				>
+				<ul class="right hide-on-med-and-down">
+					<!-- <li><a href="sass.html">Sass</a></li>
+					<li><a href="badges.html">Components</a></li>
+					<li><a href="collapsible.html">Javascript</a></li>
+					<li><a href="mobile.html">Mobile</a></li> -->
+				</ul>
+			</div>
+		</nav>
+
+		<!-- <ul class="sidenav" id="mobile-demo">
+			<li><a href="sass.html">Sass</a></li>
+			<li><a href="badges.html">Components</a></li>
+			<li><a href="collapsible.html">Javascript</a></li>
+			<li><a href="mobile.html">Mobile</a></li>
+		</ul> -->
+
+		<div class="container">
+			<div class="chips chips-placeholder">
+				<input class="custom-class" style="width: 100% !important" />
+			</div>
+			<div class="progress">
+				<div class="indeterminate"></div>
+			</div>
+			<div class="row"></div>
+		</div>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<!-- Compiled and minified JavaScript -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+		<script>
+			//  with jQuery
+			let products = ["asdasd", "asdads"];
+			$(document).ready(function() {
+				$(".progress").hide();
+				$(".sidenav").sidenav();
+			});
+
+			$(".chips-placeholder").chips({
+				placeholder: "Find your product",
+				secondaryPlaceholder: "+Tag",
+				onChipAdd: onChipAdd
+			});
+
+			function onChipAdd(res) {
+				// var data = res[0].outerText.split("\nclose");
+				$(".progress").show();
+				var separators = ["\nclose\n", "\nclose", "\n"];
+				var tokens = res[0].outerText.split(
+					new RegExp(separators.join("|"), "g")
+				);
+
+				tokens.pop();
+
+				// var data = tokens.join;
+				var data = tokens.join("+");
+
+				axios
+					.get("/search/" + data)
+					.then(function(response) {
+						// handle success
+						$(".progress").hide();
+						products.push(response.data.products);
+						$(".row").empty();
+						response.data.products.forEach((product) => {
+							console.log(product.productBaseInfoV1);
+
+							$(".row").append(`	<div class="col s6 m4">
+					                          <div class="card" style="height:600px">
+                                           <div class="card-image" style="padding:5%">
+                                              <img
+                                                height="300px"
+                                                width="200px"
+                                                src=${
+																									product.productBaseInfoV1
+																										.imageUrls["400x400"]
+																								}
+                                              />
+                                           </div>
+                                           <div class="card-content">
+							<span class="card-title" style="font-size:14px">${
+								product.productBaseInfoV1.title
+							}</span>
+							<p>
+                  ${product.productBaseInfoV1.productDescription.slice(
+										0,
+										100
+									)} ...<a href="#">Read more<a/>
+							</p>
+						</div>
+						<div class="card-action">
+							<p>${product.productBaseInfoV1.maximumRetailPrice.amount} ₹</p>
+						</div>
+			                                 </div>
+                                     </div>`);
+						});
+					})
+					.catch(function(error) {
+						// handle error
+						console.log(error);
+					});
+			}
+		</script>
+	</body>
+</html>
