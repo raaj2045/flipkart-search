@@ -20,10 +20,10 @@
 
 		<link rel="stylesheet" href="/stylesheets/style.css" />
 	</head>
-	<body>
-		<nav>
+	<body style="background-color: #e3f2fd ">
+		<nav style="background-color: #512da8 ; z-index:1">
 			<div class="nav-wrapper">
-				<a href="#!" class="brand-logo">Search</a>
+				<a href="#!" class="brand-logo" style="margin-left: 5%">Search</a>
 				<a href="#" data-target="mobile-demo" class="sidenav-trigger"
 					><i class="material-icons">menu</i></a
 				>
@@ -47,8 +47,8 @@
 			<div class="chips chips-placeholder">
 				<input class="custom-class" style="width: 100% !important" />
 			</div>
-			<div class="progress">
-				<div class="indeterminate"></div>
+			<div class="progress" style="background-color: white">
+				<div class="indeterminate" style="background-color: #311b92"></div>
 			</div>
 			<div class="row"></div>
 		</div>
@@ -70,33 +70,39 @@
 			$(".chips-placeholder").chips({
 				placeholder: "Find your product",
 				secondaryPlaceholder: "+Tag",
-				onChipAdd: onChipAdd
+				onChipAdd: onChipAdd,
+				onChipDelete: onChipAdd
 			});
 
+			//On adding a new chip
 			function onChipAdd(res) {
-				// var data = res[0].outerText.split("\nclose");
-				$(".progress").show();
-				var separators = ["\nclose\n", "\nclose", "\n"];
-				var tokens = res[0].outerText.split(
-					new RegExp(separators.join("|"), "g")
-				);
+				console.log(res[0].outerText);
+				if (res[0].outerText) {
+					// var data = res[0].outerText.split("\nclose");
+					$(".progress").show();
+					var separators = ["\nclose\n", "\nclose", "\n"];
+					var tokens = res[0].outerText.split(
+						new RegExp(separators.join("|"), "g")
+					);
 
-				tokens.pop();
+					tokens.pop();
 
-				// var data = tokens.join;
-				var data = tokens.join("+");
+					// var data = tokens.join;
+					var data = tokens.join("+");
 
-				axios
-					.get("/search/" + data)
-					.then(function(response) {
-						// handle success
-						$(".progress").hide();
-						products.push(response.data.products);
-						$(".row").empty();
-						response.data.products.forEach((product) => {
-							console.log(product.productBaseInfoV1);
+					//API call to fetch products
+					axios
+						.get("/search/" + data)
+						.then(function(response) {
+							// handle success
+							$(".progress").hide();
+							products.push(response.data.products);
+							$(".row").empty();
+							response.data.products.forEach((product) => {
+								console.log(product.productBaseInfoV1);
 
-							$(".row").append(`	<div class="col s6 m4">
+								//Display the results!
+								$(".row").append(`	<div class="col s6 m4">
 					                          <div class="card" style="height:600px">
                                            <div class="card-image" style="padding:5%">
                                               <img
@@ -124,12 +130,15 @@
 						</div>
 			                                 </div>
                                      </div>`);
+							});
+						})
+						.catch(function(error) {
+							// handle error
+							console.log(error);
 						});
-					})
-					.catch(function(error) {
-						// handle error
-						console.log(error);
-					});
+				} else {
+					$(".row").empty();
+				}
 			}
 		</script>
 	</body>
